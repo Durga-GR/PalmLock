@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#000000">
+  <title>PALMLOCK – Zero-Vision Relational Haptic Payment Protocol for the Visually Impaired</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Touch digitizer runs on full-screen black canvas -->
+  <canvas id="stealthCanvas"></canvas>
+
+  <!-- Success & Decoy Receipt Overlay -->
+  <div id="resultCard">
+    <div class="status-icon">✓</div>
+    <h1>SUCCESS</h1>
+    <p id="resultMessage">₹520 Transferred Successfully</p>
+    <div class="badge" id="securityBadge">Zero-Vision Verified</div>
+    <button class="btn-reset" id="resetBtn">New Transaction</button>
+  </div>
+
+  <script src="engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
