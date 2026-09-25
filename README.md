@@ -86,4 +86,4 @@ Vanilla JavaScript (ES6+), HTML5 Canvas, CSS3. Zero build step, zero external de
 
 
 ###LINK
-https://palmlock.netlify.app/
+https://palmlockn.netlify.app/
