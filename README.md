@@ -82,3 +82,8 @@ Run through these in order on a real Android phone, over HTTPS:
 ### Tech Stack
 
 Vanilla JavaScript (ES6+), HTML5 Canvas, CSS3. Zero build step, zero external dependencies, zero backend servers. Uses the W3C Vibration API, Geolocation API, Touch Events API, and DeviceMotionEvent / DeviceOrientationEvent.
+
+
+
+###LINK
+https://palmlock.netlify.app/
