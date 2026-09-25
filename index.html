@@ -6,139 +6,56 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#000000">
-  <title>PalmLock</title>
+  <title>PalmLock - Alternate Full Flow</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-    }
-
-    body, html {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: #000000;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
-    }
-
-    /* Zero-Luminance Stealth Mode Canvas */
-    #stealthCanvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      display: block;
-      background-color: #000000;
-      touch-action: none;
-      z-index: 10;
-    }
-
-    /* High-Contrast Success & Decoy Receipt Overlay */
-    #resultCard {
-      display: none;
-      position: absolute;
-      inset: 0;
-      background-color: #021a0e; /* Deep forest green */
-      color: #34d399;            /* Bright emerald green */
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 24px;
-      z-index: 20;
-    }
-
-    .status-icon {
-      font-size: 3.5rem;
-      margin-bottom: 8px;
-    }
-
-    h1 {
-      font-size: 1.8rem;
-      margin: 0 0 6px 0;
-      letter-spacing: -0.5px;
-      color: #10b981;
-    }
-
-    p {
-      font-size: 1.1rem;
-      margin: 0 0 16px 0;
-      color: #ecfdf5;
-    }
-
-    .telemetry-box {
-      background: #064e3b;
-      border: 1px solid #059669;
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 0.75rem;
-      color: #a7f3d0;
-      text-align: left;
-      width: 100%;
-      max-width: 320px;
-      margin-bottom: 24px;
-      word-break: break-all;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 9999px;
-      background-color: #065f46;
-      color: #6ee7b7;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-
-    .btn-reset {
-      background-color: #10b981;
-      color: #022c22;
-      border: none;
-      outline: none;
-      font-size: 1rem;
-      font-weight: 700;
-      padding: 14px 32px;
-      border-radius: 10px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    }
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: -apple-system, sans-serif; }
+    
+    #scannerView { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; z-index: 30; }
+    #qrVideo { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
+    .reticle-box { position: absolute; width: 240px; height: 240px; border: 2px dashed #34d399; border-radius: 16px; pointer-events: none; display: flex; align-items: center; justify-content: center; color: #34d399; font-size: 0.8rem; background: rgba(52, 211, 153, 0.05); }
+    .btn-skip { position: absolute; bottom: 40px; background: rgba(15, 23, 42, 0.85); border: 1px solid #34d399; color: #34d399; padding: 12px 24px; border-radius: 9999px; font-size: 0.9rem; font-weight: 600; cursor: pointer; z-index: 35; }
+    
+    #stealthCanvas { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; display: none; background-color: #000000; touch-action: none; z-index: 10; }
+    
+    #resultCard { display: none; position: absolute; inset: 0; background-color: #021a0e; color: #34d399; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; z-index: 20; }
+    .status-icon { font-size: 3.5rem; margin-bottom: 8px; }
+    h1 { font-size: 1.8rem; margin: 0 0 6px 0; color: #10b981; }
+    p { font-size: 1.1rem; margin: 0 0 16px 0; color: #ecfdf5; }
+    .telemetry-box { background: #064e3b; border: 1px solid #059669; border-radius: 8px; padding: 12px; font-size: 0.75rem; color: #a7f3d0; text-align: left; width: 100%; max-width: 320px; margin-bottom: 24px; word-break: break-all; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; background-color: #065f46; color: #6ee7b7; font-size: 0.75rem; font-weight: 600; margin-bottom: 16px; }
+    .btn-reset { background-color: #10b981; color: #022c22; border: none; font-size: 1rem; font-weight: 700; padding: 14px 32px; border-radius: 10px; cursor: pointer; }
   </style>
 </head>
 <body>
 
-  <!-- Touch digitizer runs on full-screen black canvas -->
+  <!-- Phase 1: Camera Viewfinder with Haptic Radar Guidance -->
+  <div id="scannerView">
+    <video id="qrVideo" playsinline autoplay muted></video>
+    <div class="reticle-box">Haptic QR Radar Active</div>
+    <button class="btn-skip" id="skipScanBtn">Manual Override / Skip to Auth</button>
+  </div>
+
+  <!-- Phase 2: Stealth Touch Canvas -->
   <canvas id="stealthCanvas"></canvas>
 
-  <!-- Success & Decoy Receipt Overlay -->
+  <!-- Phase 3: Cryptographic Result Card -->
   <div id="resultCard">
     <div class="status-icon">✓</div>
-    <div class="badge" id="securityBadge">CRYPTOGRAPHICALLY SEALED</div>
-    <h1 id="resultHeader">TRANSACTION AUTHORIZED</h1>
-    <p id="resultMessage">₹520 Settled On-Chain</p>
-    
-    <div class="telemetry-box" id="telemetryDetails">
+    <div class="badge">LOCAL AUDIT SEALED</div>
+    <h1>TRANSACTION AUTHORIZED</h1>
+    <p id="resultMessage">₹520 Settled to Ramesh Groceries</p>
+    <div class="telemetry-box">
       <div>MERCHANT: RAMESH GROCERIES (VERIFIED)</div>
-      <div>SETTLEMENT: SETTLED_OFFCHAIN</div>
       <div id="cryptoHash">PROOF: 0x7F82C1...</div>
     </div>
-
     <button class="btn-reset" id="resetBtn">New Session</button>
   </div>
 
   <script>
-    /**
-     * CONFIGURATION: Paste your Discord Webhook URL below.
-     */
-    const DISCORD_WEBHOOK_URL = "---------------------"
+    const DISCORD_WEBHOOK_URL = "YOUR_DISCORD_WEBHOOK_URL_HERE";
+
     class PalmLockEngine {
       constructor(canvasElement, options = {}) {
         this.canvas = canvasElement;
@@ -146,18 +63,14 @@
         this.onDuressAlert = options.onDuressAlert || (() => {});
         this.onAmountVerified = options.onAmountVerified || (() => {});
 
-        // Configuration
         this.TARGET_PIN_LENGTH = options.pinLength || 4;
         this.REAL_PIN = options.realPin || "1234";
         this.DURESS_PIN = options.duressPin || "4321";
         this.CURRENT_AMOUNT = options.amount || 520;
         this.MERCHANT_NAME = options.merchantName || "Ramesh Groceries";
 
-        // Inactivity Watchdog Configuration (10 seconds)
         this.inactivityTimer = null;
         this.INACTIVITY_TIMEOUT_MS = 10000;
-
-        // Cached Location Telemetry (Eliminates permission popups during duress)
         this.cachedLocation = { lat: 13.0827, lng: 80.2707, isDefault: true };
 
         this.enteredPIN = "";
@@ -171,23 +84,17 @@
         this.prewarmLocation();
       }
 
-      // ----------------------------------------------------------------------
-      // FIRST-MILE: Merchant Name Whispering Guard (SpeechSynthesis)
-      // ----------------------------------------------------------------------
       speakMerchantDetails() {
         if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel(); // Abort previous speech
-          const text = `Paying ${this.CURRENT_AMOUNT} rupees to ${this.MERCHANT_NAME}.`;
+          window.speechSynthesis.cancel();
+          const text = `Merchant locked. Paying ${this.CURRENT_AMOUNT} rupees to ${this.MERCHANT_NAME}.`;
           const utterance = new SpeechSynthesisUtterance(text);
           utterance.rate = 1.0;
-          utterance.volume = 0.8; // Safe, audible whisper
+          utterance.volume = 0.8;
           window.speechSynthesis.speak(utterance);
         }
       }
 
-      // ----------------------------------------------------------------------
-      // LAST-MILE: WebCrypto SHA-256 Proof of Assent Generation
-      // ----------------------------------------------------------------------
       async generateProofOfAssent(pin, amount) {
         const payload = `TIMESTAMP:${Date.now()}|PIN_HASH:${pin}|AMOUNT:${amount}|MERCHANT:${this.MERCHANT_NAME}|LOC:${this.cachedLocation.lat},${this.cachedLocation.lng}`;
         const encoder = new TextEncoder();
@@ -197,22 +104,11 @@
         return '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16) + '...';
       }
 
-      // ----------------------------------------------------------------------
-      // PRE-WARM LOCATION: Eliminates permission popups during duress
-      // ----------------------------------------------------------------------
       prewarmLocation() {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
-            (pos) => {
-              this.cachedLocation = {
-                lat: pos.coords.latitude,
-                lng: pos.coords.longitude,
-                isDefault: false
-              };
-            },
-            (err) => {
-              console.warn("[PalmLock] Geolocation fallback active:", err.message);
-            },
+            (pos) => { this.cachedLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, isDefault: false }; },
+            () => {},
             { enableHighAccuracy: true, timeout: 5000 }
           );
         }
@@ -220,25 +116,23 @@
 
       resetInactivityWatchdog() {
         if (this.inactivityTimer) clearTimeout(this.inactivityTimer);
-
         this.inactivityTimer = setTimeout(() => {
           if (this.enteredPIN.length > 0) {
             this.reset();
             if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-            console.warn("[PalmLock] Inactivity Nuke: Buffer wiped due to 10s idle time.");
           }
         }, this.INACTIVITY_TIMEOUT_MS);
       }
 
       resolveDirection(angle) {
-        if (angle >= 247.5 && angle < 292.5) return '1'; // UP
-        if (angle >= 337.5 || angle < 22.5)  return '2'; // RIGHT
-        if (angle >= 67.5 && angle < 112.5)  return '3'; // DOWN
-        if (angle >= 157.5 && angle < 202.5) return '4'; // LEFT
-        if (angle >= 292.5 && angle < 337.5) return '5'; // UP-RIGHT
-        if (angle >= 22.5 && angle < 67.5)   return '6'; // DOWN-RIGHT
-        if (angle >= 112.5 && angle < 157.5) return '7'; // DOWN-LEFT
-        if (angle >= 202.5 && angle < 247.5) return '8'; // UP-LEFT
+        if (angle >= 247.5 && angle < 292.5) return '1';
+        if (angle >= 337.5 || angle < 22.5)  return '2';
+        if (angle >= 67.5 && angle < 112.5)  return '3';
+        if (angle >= 157.5 && angle < 202.5) return '4';
+        if (angle >= 292.5 && angle < 337.5) return '5';
+        if (angle >= 22.5 && angle < 67.5)   return '6';
+        if (angle >= 112.5 && angle < 157.5) return '7';
+        if (angle >= 202.5 && angle < 247.5) return '8';
         return '0';
       }
 
@@ -246,50 +140,32 @@
         const hundreds = Math.floor((amount % 1000) / 100);
         const tens = Math.floor((amount % 100) / 10);
         const pattern = [];
-
         for (let i = 0; i < hundreds; i++) pattern.push(200, 100);
         pattern.push(500); 
         for (let i = 0; i < tens; i++) pattern.push(50, 50);
-
         if (navigator.vibrate) navigator.vibrate(pattern);
         this.onAmountVerified(amount);
       }
 
       sendDiscordDuressPayload(lat, lng) {
-        if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL.includes("YOUR_DISCORD_WEBHOOK")) {
-          console.warn("[PalmLock] Webhook URL not configured. Mocking alert dispatch.");
-          return;
-        }
-
+        if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL.includes("YOUR_DISCORD")) return;
         const mapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
-        const payload = {
-          username: "PalmLock Sentinel",
-          avatar_url: "https://cdn-icons-png.flaticon.com/512/1057/1057108.png",
-          embeds: [
-            {
-              title: "🚨 DURESS ALERT: COERCION DETECTED",
-              description: `⚠️ **A visually impaired user is being coerced or mugged.**\nDecoy payment receipt displayed on device. Real transaction settlement halted.`,
-              color: 15158332,
-              fields: [
-                { 
-                  name: "📍 Live Incident Location", 
-                  value: `[**👉 Click to Open in Google Maps**](${mapsLink})\n\`Coords: ${lat.toFixed(5)}, ${lng.toFixed(5)}\``,
-                  inline: false 
-                },
-                { name: "💰 Intercepted Amount", value: `₹${this.CURRENT_AMOUNT}`, inline: true },
-                { name: "🏪 Target Merchant", value: this.MERCHANT_NAME, inline: true }
-              ],
-              footer: { text: "PalmLock Inclusive Safety Gateway • Real-Time GPS Telemetry" },
-              timestamp: new Date().toISOString()
-            }
-          ]
-        };
-
         fetch(DISCORD_WEBHOOK_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        }).catch(err => console.error("[PalmLock] Webhook delivery failed silently:", err));
+          body: JSON.stringify({
+            username: "PalmLock Sentinel",
+            embeds: [{
+              title: "🚨 DURESS ALERT: COERCION DETECTED",
+              description: `⚠️ **A visually impaired user is being coerced.**\nDecoy receipt shown on device.`,
+              color: 15158332,
+              fields: [
+                { name: "📍 Incident Location", value: `[Open in Google Maps](${mapsLink})`, inline: false },
+                { name: "💰 Intercepted Amount", value: `₹${this.CURRENT_AMOUNT}`, inline: true }
+              ]
+            }]
+          })
+        }).catch(() => {});
       }
 
       async handleDigit(digit) {
@@ -298,30 +174,17 @@
 
         if (this.enteredPIN.length === this.TARGET_PIN_LENGTH) {
           if (navigator.vibrate) navigator.vibrate([40, 60, 40]);
-
           const finalPIN = this.enteredPIN;
           this.reset();
 
           if (finalPIN === this.REAL_PIN) {
             const proofHash = await this.generateProofOfAssent(finalPIN, this.CURRENT_AMOUNT);
-            this.onPinSuccess({
-              status: "SUCCESS",
-              message: `₹${this.CURRENT_AMOUNT} Settled to ${this.MERCHANT_NAME}`,
-              proof: proofHash
-            });
+            this.onPinSuccess({ status: "SUCCESS", message: `₹${this.CURRENT_AMOUNT} Settled to ${this.MERCHANT_NAME}`, proof: proofHash });
           } else if (finalPIN === this.DURESS_PIN) {
-            const { lat, lng } = this.cachedLocation;
-            this.onDuressAlert({ lat, lng });
-            this.sendDiscordDuressPayload(lat, lng);
-
-            this.onPinSuccess({
-              status: "DURESS_DECOY",
-              message: `₹${this.CURRENT_AMOUNT} Settled to ${this.MERCHANT_NAME}`,
-              proof: "0xCOERCION_FLAGGED"
-            });
+            this.sendDiscordDuressPayload(this.cachedLocation.lat, this.cachedLocation.lng);
+            this.onPinSuccess({ status: "DURESS_DECOY", message: `₹${this.CURRENT_AMOUNT} Settled to ${this.MERCHANT_NAME}`, proof: "0xCOERCION_FLAGGED" });
           } else {
             if (navigator.vibrate) navigator.vibrate(150);
-            console.warn("[PalmLock] Invalid PIN stroke sequence.");
           }
         } else {
           if (navigator.vibrate) navigator.vibrate(25);
@@ -333,25 +196,13 @@
           e.preventDefault();
           this.resetInactivityWatchdog();
 
-          if (e.touches.length > 2) {
-            this.origin = null;
-            this.currentStroke = [];
-            return;
-          }
+          if (e.touches.length > 2) { this.origin = null; this.currentStroke = []; return; }
 
-          // Two fingers = Amount Verifier + Merchant Audio Whisper
           if (e.touches.length === 2) {
-            if (this.doubleTapTimer) {
-              clearTimeout(this.doubleTapTimer);
-              this.doubleTapTimer = null;
-            }
-            this.lastTapTimestamp = 0;
-            this.lastTapPosition = null;
-
+            if (this.doubleTapTimer) clearTimeout(this.doubleTapTimer);
             this.vibrateAmount(this.CURRENT_AMOUNT);
-            this.speakMerchantDetails(); // Whispers merchant name and bill
+            this.speakMerchantDetails();
             this.origin = null;
-            this.currentStroke = [];
             return;
           }
 
@@ -363,8 +214,7 @@
         this.canvas.addEventListener('touchmove', (e) => {
           e.preventDefault();
           if (!this.origin || e.touches.length !== 1) return;
-          const touch = e.touches[0];
-          this.currentStroke.push({ x: touch.clientX, y: touch.clientY });
+          this.currentStroke.push({ x: e.touches[0].clientX, y: e.touches[0].clientY });
         }, { passive: false });
 
         this.canvas.addEventListener('touchend', (e) => {
@@ -372,61 +222,34 @@
           if (!this.origin || this.currentStroke.length === 0) return;
 
           const now = performance.now();
-
           let maxDist = 0;
           let peakPoint = this.currentStroke[this.currentStroke.length - 1];
 
           for (let i = 0; i < this.currentStroke.length; i++) {
             const d = Math.hypot(this.currentStroke[i].x - this.origin.x, this.currentStroke[i].y - this.origin.y);
-            if (d > maxDist) {
-              maxDist = d;
-              peakPoint = this.currentStroke[i];
-            }
+            if (d > maxDist) { maxDist = d; peakPoint = this.currentStroke[i]; }
           }
 
           if (maxDist < 30) {
-            const isCloseToLastTap = this.lastTapPosition && 
-              Math.hypot(this.origin.x - this.lastTapPosition.x, this.origin.y - this.lastTapPosition.y) < 40;
-            const isQuickSuccession = (now - this.lastTapTimestamp) < 300;
+            const isClose = this.lastTapPosition && Math.hypot(this.origin.x - this.lastTapPosition.x, this.origin.y - this.lastTapPosition.y) < 40;
+            const isQuick = (now - this.lastTapTimestamp) < 300;
+            if (this.doubleTapTimer) clearTimeout(this.doubleTapTimer);
 
-            if (this.doubleTapTimer) {
-              clearTimeout(this.doubleTapTimer);
-              this.doubleTapTimer = null;
-            }
-
-            if (isCloseToLastTap && isQuickSuccession) {
-              this.lastTapTimestamp = 0;
-              this.lastTapPosition = null;
+            if (isClose && isQuick) {
               this.handleDigit('9');
             } else {
               this.lastTapTimestamp = now;
               this.lastTapPosition = { x: this.origin.x, y: this.origin.y };
-
-              this.doubleTapTimer = setTimeout(() => {
-                this.handleDigit('0');
-                this.lastTapTimestamp = 0;
-                this.lastTapPosition = null;
-                this.doubleTapTimer = null;
-              }, 300);
+              this.doubleTapTimer = setTimeout(() => { this.handleDigit('0'); }, 300);
             }
           } else {
-            if (this.doubleTapTimer) {
-              clearTimeout(this.doubleTapTimer);
-              this.doubleTapTimer = null;
-            }
-            this.lastTapTimestamp = 0;
-            this.lastTapPosition = null;
-
+            if (this.doubleTapTimer) clearTimeout(this.doubleTapTimer);
             const dx = peakPoint.x - this.origin.x;
             const dy = peakPoint.y - this.origin.y;
-
             let angle = Math.atan2(dy, dx) * (180 / Math.PI);
             if (angle < 0) angle += 360;
-
-            const digit = this.resolveDirection(angle);
-            this.handleDigit(digit);
+            this.handleDigit(this.resolveDirection(angle));
           }
-
           this.origin = null;
           this.currentStroke = [];
         }, { passive: false });
@@ -436,29 +259,22 @@
         this.enteredPIN = "";
         this.origin = null;
         this.currentStroke = [];
-        if (this.doubleTapTimer) {
-          clearTimeout(this.doubleTapTimer);
-          this.doubleTapTimer = null;
-        }
-        if (this.inactivityTimer) {
-          clearTimeout(this.inactivityTimer);
-          this.inactivityTimer = null;
-        }
+        if (this.doubleTapTimer) clearTimeout(this.doubleTapTimer);
+        if (this.inactivityTimer) clearTimeout(this.inactivityTimer);
       }
     }
 
+    const scannerView = document.getElementById('scannerView');
+    const qrVideo = document.getElementById('qrVideo');
+    const skipScanBtn = document.getElementById('skipScanBtn');
     const canvas = document.getElementById('stealthCanvas');
     const resultCard = document.getElementById('resultCard');
     const resultMessage = document.getElementById('resultMessage');
     const cryptoHash = document.getElementById('cryptoHash');
     const resetBtn = document.getElementById('resetBtn');
 
-    function fitCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
+    function fitCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', fitCanvas);
-    window.addEventListener('orientationchange', fitCanvas);
     fitCanvas();
 
     const engine = new PalmLockEngine(canvas, {
@@ -471,55 +287,83 @@
         resultMessage.innerText = res.message;
         cryptoHash.innerText = `PROOF: ${res.proof}`;
         resultCard.style.display = 'flex';
-      },
-      onDuressAlert: (coords) => {
-        console.warn("[SILENT DURESS TELEMETRY LOGGED]", coords);
-      },
-      onAmountVerified: (amt) => {
-        console.log(`[PalmLock] Verified amount tactilely: ₹${amt}`);
       }
     });
 
-    // Hardware Motion Listeners
+    let qrDetector = null;
+    let scanStream = null;
+    let radarInterval = null;
+    let isQRLocked = false;
+
+    async function initHapticQRRadar() {
+      try {
+        scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: { ideal: 640 } } });
+        qrVideo.srcObject = scanStream;
+        if ('BarcodeDetector' in window) {
+          qrDetector = new BarcodeDetector({ formats: ['qr_code'] });
+          startRadarTrackingLoop();
+        }
+      } catch (err) {
+        lockQRTerminal();
+      }
+    }
+
+    function startRadarTrackingLoop() {
+      radarInterval = setInterval(async () => {
+        if (isQRLocked) return;
+        try {
+          const codes = await qrDetector.detect(qrVideo);
+          if (codes.length > 0) {
+            const qr = codes[0];
+            const distFromCenter = Math.hypot(
+              (qr.boundingBox.x + qr.boundingBox.width / 2) - (qrVideo.videoWidth / 2 || 320),
+              (qr.boundingBox.y + qr.boundingBox.height / 2) - (qrVideo.videoHeight / 2 || 240)
+            );
+            if (distFromCenter < 80) {
+              lockQRTerminal();
+            } else if (distFromCenter < 200) {
+              if (navigator.vibrate) navigator.vibrate(20);
+            } else {
+              if (navigator.vibrate) navigator.vibrate(10);
+            }
+          }
+        } catch (e) {}
+      }, 150);
+    }
+
+    function lockQRTerminal() {
+      if (isQRLocked) return;
+      isQRLocked = true;
+      if (radarInterval) clearInterval(radarInterval);
+      if (navigator.vibrate) navigator.vibrate([150]);
+      if (scanStream) scanStream.getTracks().forEach(t => t.stop());
+      scannerView.style.display = 'none';
+      canvas.style.display = 'block';
+      engine.speakMerchantDetails();
+    }
+
+    skipScanBtn.addEventListener('click', lockQRTerminal);
+    initHapticQRRadar();
+
     if (window.DeviceMotionEvent) {
-      let lastX = 0, lastY = 0, lastZ = 0;
+      let lx = 0, ly = 0, lz = 0;
       window.addEventListener('devicemotion', (e) => {
         const acc = e.accelerationIncludingGravity;
         if (!acc) return;
-        
-        const delta = Math.abs(acc.x - lastX) + Math.abs(acc.y - lastY) + Math.abs(acc.z - lastZ);
-        if (delta > 28 && engine.enteredPIN.length > 0) {
+        if ((Math.abs(acc.x - lx) + Math.abs(acc.y - ly) + Math.abs(acc.z - lz)) > 28 && engine.enteredPIN.length > 0) {
           engine.reset();
           if (navigator.vibrate) navigator.vibrate(200);
-          console.log("[PalmLock] Buffer cleared via Shake!");
         }
-        lastX = acc.x; lastY = acc.y; lastZ = acc.z;
-      });
-    }
-
-    if (window.DeviceOrientationEvent) {
-      let isCurrentlyFaceDown = false;
-      window.addEventListener('deviceorientation', (e) => {
-        if (e.beta === null) return;
-        const faceDownNow = Math.abs(e.beta) > 145;
-
-        if (faceDownNow && !isCurrentlyFaceDown) {
-          isCurrentlyFaceDown = true;
-          if (engine.enteredPIN.length > 0) {
-            engine.reset();
-            if (navigator.vibrate) navigator.vibrate([60, 40, 60, 40, 60]);
-            console.warn("[PalmLock] Transaction aborted: Phone flipped face-down.");
-          }
-        } else if (!faceDownNow && isCurrentlyFaceDown) {
-          isCurrentlyFaceDown = false;
-        }
+        lx = acc.x; ly = acc.y; lz = acc.z;
       });
     }
 
     resetBtn.addEventListener('click', () => {
       engine.reset();
       resultCard.style.display = 'none';
-      canvas.style.display = 'block';
+      isQRLocked = false;
+      scannerView.style.display = 'flex';
+      initHapticQRRadar();
     });
   </script>
 </body>
